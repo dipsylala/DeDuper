@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "DeDuper": {
+      "commandName": "Project",
+      "commandLineArgs": "c:\\input c:\\output"
+    }
+  }
+}
