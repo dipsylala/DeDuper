@@ -12,18 +12,21 @@ catch (ArgumentException ex)
 
 var inputDir = new DirectoryInfo(Environment.GetCommandLineArgs()[1]);
 var outputDir = new DirectoryInfo(Environment.GetCommandLineArgs()[2]);
+var extensions = Environment.GetCommandLineArgs().Length == 4 ?
+    Environment.GetCommandLineArgs()[3].Split(',').Select(extension => "*." + extension).ToArray() :
+    Array.Empty<string>();
 
 var recurseFileStructure = new RecurseDirectoryStructure();
-recurseFileStructure.TraverseDirectory(inputDir, outputDir);
+recurseFileStructure.TraverseDirectory(inputDir, outputDir, extensions);
 
 return 0;
 
 
 static void CheckArguments(string[] args)
 {
-    if (args.Length != 3)
+    if (args.Length != 3 && args.Length != 4)
     {
-        throw new ArgumentException("Arguments: <input directory> <output directory>");
+        throw new ArgumentException("Usage: program <input directory> <output directory> [comma delimited extensions list]");
     }
 
     if (Directory.Exists(Environment.GetCommandLineArgs()[1]) == false)
@@ -39,24 +42,24 @@ static void CheckArguments(string[] args)
 
 public class RecurseDirectoryStructure
 {
-    public void TraverseDirectory(DirectoryInfo inputDir, DirectoryInfo outputDir )
+    public void TraverseDirectory(DirectoryInfo inputDir, DirectoryInfo outputDir, string[] extensions)
     {
         var subDirectories = inputDir.EnumerateDirectories();
 
         foreach (var subDirectory in subDirectories)
         {
-            TraverseDirectory(subDirectory, outputDir);
+            TraverseDirectory(subDirectory, outputDir, extensions);
         }
 
-        var files = inputDir.EnumerateFiles();
+        var files = extensions.Length == 0 ? inputDir.EnumerateFiles() : extensions.SelectMany(inputDir.EnumerateFiles);
 
         foreach (var file in files)
         {
-            HandleFile(file, outputDir);
+            HandleFile(file, outputDir, extensions);
         }
     }
 
-    private static void HandleFile(FileSystemInfo file, FileSystemInfo outputDir)
+    private static void HandleFile(FileSystemInfo file, FileSystemInfo outputDir, string[] extensions)
     {
         using var md5 = MD5.Create();
         var name = file.Name;
