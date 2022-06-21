@@ -26,7 +26,7 @@ static void CheckArguments(string[] args)
 {
     if (args.Length != 3 && args.Length != 4)
     {
-        throw new ArgumentException("Usage: program <input directory> <output directory> [comma delimited extensions list]");
+        throw new ArgumentException("Usage: program <input directory> <output directory> [comma delimited extensions list]\nExample: DeDuper c:\\input c:\\output dll,pdb");
     }
 
     if (Directory.Exists(Environment.GetCommandLineArgs()[1]) == false)
